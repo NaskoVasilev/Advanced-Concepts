@@ -1,6 +1,8 @@
-﻿namespace TemporalTablesDemo.Data.Models
+﻿using TemporalTablesDemo.Data.Common;
+
+namespace TemporalTablesDemo.Data.Models
 {
-    public class Employee
+    public class Employee : ITemporalEntity
     {
         public int Id { get; set; }
 
@@ -9,6 +11,9 @@
         public string LastName { get; set; }
 
         public string Department { get; set; }
+
+        public int CompanyId { get; set; }
+        public Company Company { get; set; }
 
         public override string ToString()
         {

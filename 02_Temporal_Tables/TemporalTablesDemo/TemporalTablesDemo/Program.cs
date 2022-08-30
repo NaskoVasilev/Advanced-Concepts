@@ -3,6 +3,8 @@ using TemporalTablesDemo.Data.Models;
 using TemporalTablesDemo.Data;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using TemporalTablesDemo.Data.Common;
+using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
 
 namespace TemporalTablesDemo
 {
@@ -10,22 +12,67 @@ namespace TemporalTablesDemo
     {
         public static void Main(string[] args)
         {
-            // SeedData();
-            // UpdateEmployee("Leanney", "Atanas");
-            // DeleteEmployee("Ervint");
-            // var employeeId = UpdateEmployee("Atanas", "Nasko");
+            //SeedData();
+            //UpdateEmployee("Kurt", "Edited1");
+            //DeleteEmployee("Ervint");
+            //var employeeId = UpdateEmployee("Edited1", "Edited2");
 
             //if (employeeId.HasValue)
             //{
             //    PrintEmployeeHistory(employeeId.Value);
             //}
 
-            // PrintEmployeeHistory(1);
+            //PrintEmployeeHistory(1);
 
-            RestoreDeletedEmployee(2);
+            //RestoreDeletedEmployee(2);
+
+            var companyId = CreateCompany();
+            UpdateCompany(companyId, 1);
+            UpdateCompany(companyId, 2);
         }
 
-        private void SeedData()
+        private static int CreateCompany()
+        {
+            var company = new Company
+            {
+                Name = "Company 1",
+                Employees = Enumerable.Range(1, 3)
+                    .Select(x => new Employee
+                    {
+                        FirstName = "FN1-" + x,
+                        LastName = "LN1-" + x,
+                        Department = "Department1",
+                    })
+                    .ToList()
+            };
+
+            using
+            var context = new CompanyDbContext();
+            context.Add(company);
+            context.SaveChanges();
+            return company.Id;
+        }
+
+        private static void UpdateCompany(int id, int version)
+        {
+            using
+            var context = new CompanyDbContext();
+            var company = context.Companies
+                .Include(x => x.Employees)
+                .FirstOrDefault(x => x.Id == id);
+
+            company.Name = MarkAsEdited(company.Name, version);
+            foreach (var employee in company.Employees)
+            {
+                employee.LastName = MarkAsEdited(employee.LastName, version);
+                employee.FirstName = MarkAsEdited(employee.FirstName, version);
+            }
+
+            context.Update(company);
+            context.SaveChanges();
+        }
+
+        private static void SeedData()
         {
             Console.WriteLine("Initializing...");
             Employee hrEmp1 = new()
@@ -79,6 +126,7 @@ namespace TemporalTablesDemo
             var employee = dbContext.Employees.FirstOrDefault(x => x.FirstName == firstName);
             if (employee != null)
             {
+                var change = new PropertyChange(nameof(Employee.FirstName), employee.FirstName, newName);
                 employee.FirstName = newName;
                 dbContext.SaveChanges();
                 Console.WriteLine($"Employee: {employee.Id}, {employee.FirstName} {employee.LastName} was successfully updated");
@@ -110,12 +158,14 @@ namespace TemporalTablesDemo
                 {
                     Employee = e,
                     PeriodStart = EF.Property<DateTime>(e, "PeriodStart"),
-                    PeriodEnd = EF.Property<DateTime>(e, "PeriodEnd")
+                    PeriodEnd = EF.Property<DateTime>(e, "PeriodEnd"),
+                    Changes = EF.Property<string>(e, ModelConstants.ChangesColumnName),
                 })
                 .ToList()
                 .ForEach(x =>
                 {
-                    Console.WriteLine(x.ToString());
+                    Console.WriteLine(x.Employee.ToString());
+                    Console.WriteLine($"Chnages: {x.Changes}");
                     Console.WriteLine($"{x.PeriodStart} - {x.PeriodEnd}");
                     Console.WriteLine(new string('-', 100));
                 });
@@ -162,5 +212,7 @@ namespace TemporalTablesDemo
                 dbContext.Database.ExecuteSqlInterpolated($"SET IDENTITY_INSERT {entityType.GetSchema()}.{entityType.GetTableName()} OFF;");
             }
         }
+
+        private static string MarkAsEdited(string value, int version) => $"{value}-E-{version}";
     }
 }
