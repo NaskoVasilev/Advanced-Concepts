@@ -1,4 +1,6 @@
-﻿namespace TemporalTablesDemo.Data.Common
+﻿using System.Text.Json.Serialization;
+
+namespace TemporalTablesDemo.Data.Common
 {
     public class PropertyChange
     {
@@ -13,10 +15,13 @@
             CurrentValue = currentValue;
         }
 
+        [JsonPropertyName("N")]
         public string Name { get; set; }
 
+        [JsonPropertyName("P")]
         public object PreviousValue { get; set; }
 
+        [JsonPropertyName("C")]
         public object CurrentValue { get; set; }
     }
 }
