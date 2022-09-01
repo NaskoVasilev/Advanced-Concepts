@@ -21,6 +21,8 @@ namespace TemporalTablesDemo.Data
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
+            builder.Entity<Employee>().OwnsOne(x => x.Birth);
+
             // TODO get all models implementing ITemporalTable and register them automatically
             builder.Entity<Employee>().ToTable("Employees", e => e.IsTemporal());
             builder.Entity<Employee>().Property<string>(ModelConstants.ChangesColumnName);

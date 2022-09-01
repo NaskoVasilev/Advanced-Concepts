@@ -15,6 +15,8 @@ namespace TemporalTablesDemo.Data.Models
         public int CompanyId { get; set; }
         public Company Company { get; set; }
 
+        public BirthAttributes Birth { get; set; }
+
         public override string ToString()
         {
             return $"{this.Id}, {this.FirstName} {this.LastName} working in {this.Department}";
