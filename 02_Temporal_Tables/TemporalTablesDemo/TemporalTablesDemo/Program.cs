@@ -5,6 +5,9 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using TemporalTablesDemo.Data.Common;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using TemporalTablesDemo.Data.Models.Enums;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace TemporalTablesDemo
 {
@@ -19,15 +22,61 @@ namespace TemporalTablesDemo
 
             //if (employeeId.HasValue)
             //{
-                // PrintEmployeeHistory(employeeId.Value);
+            // PrintEmployeeHistory(employeeId.Value);
             //}
 
 
             // RestoreDeletedEmployee(2);
 
-            var companyId = CreateCompany();
-            UpdateCompany(companyId, 1);
-            UpdateCompany(companyId, 2);
+            //var companyId = CreateCompany();
+            //UpdateCompany(companyId, 1);
+            //UpdateCompany(companyId, 2);
+
+            var carId = CreateCar();
+            UpdateCar(carId, 1);
+            UpdateCar(carId, 2);
+        }
+
+        private static int CreateCar()
+        {
+            var car = new Car
+            {
+                Make = "Lexus",
+                Model = "IS 220",
+                Engine = new Engine
+                {
+                    Horsepower = 177,
+                    Capacity = 2.2,
+                    Type = EngineType.Diesel,
+                }
+            };
+
+            using
+            var context = new CompanyDbContext();
+            context.Add(car);
+            context.SaveChanges();
+            return car.Id;
+        }
+
+        private static void UpdateCar(int id, int version)
+        {
+            var rnd = new Random();
+            using
+            var context = new CompanyDbContext();
+            var car = context.Cars
+                .FirstOrDefault(x => x.Id == id);
+
+            car.Model = MarkAsEdited(car.Model, version);
+            car.Make = MarkAsEdited(car.Make, version);
+            car.Engine = new Engine()
+            {
+                Capacity = rnd.Next(2, 5),
+                Horsepower = rnd.Next(100, 500),
+                Type = (EngineType)rnd.Next(1, 4),
+            };
+
+            context.Update(car);
+            context.SaveChanges();
         }
 
         private static int CreateCompany()

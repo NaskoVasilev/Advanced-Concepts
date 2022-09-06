@@ -14,6 +14,8 @@ namespace TemporalTablesDemo.Data
 
         public DbSet<Employee> Employees { get; set; }
 
+        public DbSet<Car> Cars { get; set; }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.UseSqlServer(DatabaseConfiguration.ConnectionString);
@@ -32,6 +34,19 @@ namespace TemporalTablesDemo.Data
             builder.Entity<Employee>().Property<string>(ModelConstants.ChangesColumnName);
             builder.Entity<Company>().ToTable(x => x.IsTemporal());
             builder.Entity<Company>().Property<string>(ModelConstants.ChangesColumnName);
+
+            builder.Entity<Car>().OwnsOne(x => x.Engine);
+
+            builder.Entity<Car>().Property<DateTime>(ModelConstants.PeriodStartColumnName)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasColumnType("datetime2")
+                .HasColumnName(ModelConstants.PeriodStartColumnName);
+
+            builder.Entity<Car>().Property<DateTime>(ModelConstants.PeriodEndColumnName)
+                .ValueGeneratedOnAddOrUpdate()
+                .HasDefaultValue(DateTime.MaxValue)
+                .HasColumnType("datetime2")
+                .HasColumnName(ModelConstants.PeriodEndColumnName);
         }
 
         public override int SaveChanges()

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using TemporalTablesDemo.Data;
 
@@ -11,9 +12,10 @@ using TemporalTablesDemo.Data;
 namespace TemporalTablesDemo.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    partial class CompanyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20220906180242_AddedTableWithOwnedProperty")]
+    partial class AddedTableWithOwnedProperty
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -37,9 +39,8 @@ namespace TemporalTablesDemo.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("PeriodEnd")
-                        .ValueGeneratedOnUpdate()
+                        .ValueGeneratedOnAddOrUpdate()
                         .HasColumnType("datetime2")
-                        .HasDefaultValue(new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999))
                         .HasColumnName("PeriodEnd");
 
                     b.Property<DateTime>("PeriodStart")
@@ -49,7 +50,7 @@ namespace TemporalTablesDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Cars", (string)null);
+                    b.ToTable("Cars");
                 });
 
             modelBuilder.Entity("TemporalTablesDemo.Data.Models.Company", b =>
@@ -78,7 +79,7 @@ namespace TemporalTablesDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Companies", (string)null);
+                    b.ToTable("Companies");
 
                     b.ToTable(tb => tb.IsTemporal(ttb =>
                         {
@@ -128,12 +129,12 @@ namespace TemporalTablesDemo.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("Employees", (string)null);
+                    b.ToTable("Employees");
                 });
 
             modelBuilder.Entity("TemporalTablesDemo.Data.Models.Car", b =>
                 {
-                    b.OwnsOne("TemporalTablesDemo.Data.Models.Car.Engine#TemporalTablesDemo.Data.Models.Engine", "Engine", b1 =>
+                    b.OwnsOne("TemporalTablesDemo.Data.Models.Engine", "Engine", b1 =>
                         {
                             b1.Property<int>("CarId")
                                 .HasColumnType("int");
@@ -149,7 +150,7 @@ namespace TemporalTablesDemo.Migrations
 
                             b1.HasKey("CarId");
 
-                            b1.ToTable("Cars", (string)null);
+                            b1.ToTable("Cars");
 
                             b1.WithOwner()
                                 .HasForeignKey("CarId");
@@ -166,7 +167,7 @@ namespace TemporalTablesDemo.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.OwnsOne("TemporalTablesDemo.Data.Models.Employee.Birth#TemporalTablesDemo.Data.Models.BirthAttributes", "Birth", b1 =>
+                    b.OwnsOne("TemporalTablesDemo.Data.Models.BirthAttributes", "Birth", b1 =>
                         {
                             b1.Property<int>("EmployeeId")
                                 .HasColumnType("int");
@@ -176,7 +177,7 @@ namespace TemporalTablesDemo.Migrations
 
                             b1.HasKey("EmployeeId");
 
-                            b1.ToTable("Employees", (string)null);
+                            b1.ToTable("Employees");
 
                             b1.WithOwner()
                                 .HasForeignKey("EmployeeId");
