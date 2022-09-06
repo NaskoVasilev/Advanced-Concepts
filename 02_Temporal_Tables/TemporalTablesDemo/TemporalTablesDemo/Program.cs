@@ -19,12 +19,11 @@ namespace TemporalTablesDemo
 
             //if (employeeId.HasValue)
             //{
-            //    PrintEmployeeHistory(employeeId.Value);
+                // PrintEmployeeHistory(employeeId.Value);
             //}
 
-            //PrintEmployeeHistory(1);
 
-            //RestoreDeletedEmployee(2);
+            // RestoreDeletedEmployee(2);
 
             var companyId = CreateCompany();
             UpdateCompany(companyId, 1);
@@ -42,6 +41,10 @@ namespace TemporalTablesDemo
                         FirstName = "FN1-" + x,
                         LastName = "LN1-" + x,
                         Department = "Department1",
+                        Birth = new BirthAttributes()
+                        {
+                            Date = DateTime.Now
+                        }
                     })
                     .ToList()
             };
@@ -66,6 +69,7 @@ namespace TemporalTablesDemo
             {
                 employee.LastName = MarkAsEdited(employee.LastName, version);
                 employee.FirstName = MarkAsEdited(employee.FirstName, version);
+                employee.Birth.Date = DateTime.Now;
             }
 
             context.Update(company);
@@ -166,7 +170,7 @@ namespace TemporalTablesDemo
                 {
                     Console.WriteLine(x.Employee.ToString());
                     Console.WriteLine($"Chnages: {x.Changes}");
-                    Console.WriteLine($"{x.PeriodStart} - {x.PeriodEnd}");
+                    // Console.WriteLine($"{x.PeriodStart} - {x.PeriodEnd}");
                     Console.WriteLine(new string('-', 100));
                 });
         }

@@ -24,7 +24,11 @@ namespace TemporalTablesDemo.Data
             builder.Entity<Employee>().OwnsOne(x => x.Birth);
 
             // TODO get all models implementing ITemporalTable and register them automatically
-            builder.Entity<Employee>().ToTable("Employees", e => e.IsTemporal());
+            // builder.Entity<Employee>().ToTable("Employees", e => e.IsTemporal());
+
+            builder.Entity<Employee>().Property<DateTime>(ModelConstants.PeriodStartColumnName);
+            builder.Entity<Employee>().Property<DateTime>(ModelConstants.PeriodEndColumnName);
+
             builder.Entity<Employee>().Property<string>(ModelConstants.ChangesColumnName);
             builder.Entity<Company>().ToTable(x => x.IsTemporal());
             builder.Entity<Company>().Property<string>(ModelConstants.ChangesColumnName);
