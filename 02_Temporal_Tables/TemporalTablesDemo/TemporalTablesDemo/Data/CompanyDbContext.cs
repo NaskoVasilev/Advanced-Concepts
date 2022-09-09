@@ -5,6 +5,7 @@ using TemporalTablesDemo.Data.Models;
 using System.Collections.Generic;
 using System.Text.Json;
 using TemporalTablesDemo.Data.Common;
+using TemporalTablesDemo.Data.Interceptors;
 
 namespace TemporalTablesDemo.Data
 {
@@ -18,21 +19,17 @@ namespace TemporalTablesDemo.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
+            optionsBuilder.AddInterceptors(new HistoryQueryInterceptor());
             optionsBuilder.UseSqlServer(DatabaseConfiguration.ConnectionString);
         }
 
         protected override void OnModelCreating(ModelBuilder builder)
         {
-            builder.Entity<Employee>().OwnsOne(x => x.Birth);
-
             // TODO get all models implementing ITemporalTable and register them automatically
-            // builder.Entity<Employee>().ToTable("Employees", e => e.IsTemporal());
-
-            builder.Entity<Employee>().Property<DateTime>(ModelConstants.PeriodStartColumnName);
-            builder.Entity<Employee>().Property<DateTime>(ModelConstants.PeriodEndColumnName);
+            builder.Entity<Employee>().ToTable("Employees", e => e.IsTemporal());
+            builder.Entity<Company>().ToTable("Companies", e => e.IsTemporal());
 
             builder.Entity<Employee>().Property<string>(ModelConstants.ChangesColumnName);
-            builder.Entity<Company>().ToTable(x => x.IsTemporal());
             builder.Entity<Company>().Property<string>(ModelConstants.ChangesColumnName);
 
             builder.Entity<Car>().OwnsOne(x => x.Engine);
@@ -47,6 +44,8 @@ namespace TemporalTablesDemo.Data
                 .HasDefaultValue(DateTime.MaxValue)
                 .HasColumnType("datetime2")
                 .HasColumnName(ModelConstants.PeriodEndColumnName);
+
+            builder.Entity<Car>().Property<string>(ModelConstants.ChangesColumnName);
         }
 
         public override int SaveChanges()

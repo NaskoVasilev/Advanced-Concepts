@@ -12,8 +12,8 @@ using TemporalTablesDemo.Data;
 namespace TemporalTablesDemo.Migrations
 {
     [DbContext(typeof(CompanyDbContext))]
-    [Migration("20220905141723_Test1")]
-    partial class Test1
+    [Migration("20220906190432_AddedChangesColumnToCarTable")]
+    partial class AddedChangesColumnToCarTable
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,6 +23,39 @@ namespace TemporalTablesDemo.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
+
+            modelBuilder.Entity("TemporalTablesDemo.Data.Models.Car", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
+
+                    b.Property<string>("Changes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Make")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Model")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PeriodEnd")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValue(new DateTime(9999, 12, 31, 23, 59, 59, 999, DateTimeKind.Unspecified).AddTicks(9999))
+                        .HasColumnName("PeriodEnd");
+
+                    b.Property<DateTime>("PeriodStart")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("datetime2")
+                        .HasColumnName("PeriodStart");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Cars");
+                });
 
             modelBuilder.Entity("TemporalTablesDemo.Data.Models.Company", b =>
                 {
@@ -101,6 +134,33 @@ namespace TemporalTablesDemo.Migrations
                     b.HasIndex("CompanyId");
 
                     b.ToTable("Employees");
+                });
+
+            modelBuilder.Entity("TemporalTablesDemo.Data.Models.Car", b =>
+                {
+                    b.OwnsOne("TemporalTablesDemo.Data.Models.Engine", "Engine", b1 =>
+                        {
+                            b1.Property<int>("CarId")
+                                .HasColumnType("int");
+
+                            b1.Property<double>("Capacity")
+                                .HasColumnType("float");
+
+                            b1.Property<int>("Horsepower")
+                                .HasColumnType("int");
+
+                            b1.Property<int>("Type")
+                                .HasColumnType("int");
+
+                            b1.HasKey("CarId");
+
+                            b1.ToTable("Cars");
+
+                            b1.WithOwner()
+                                .HasForeignKey("CarId");
+                        });
+
+                    b.Navigation("Engine");
                 });
 
             modelBuilder.Entity("TemporalTablesDemo.Data.Models.Employee", b =>

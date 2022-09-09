@@ -4,23 +4,22 @@
 
 namespace TemporalTablesDemo.Migrations
 {
-    public partial class Test1 : Migration
+    public partial class AddedChangesColumnToCarTable : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<int>(
-                name: "Test",
-                table: "Employees",
-                type: "int",
-                nullable: false,
-                defaultValue: 0);
+            migrationBuilder.AddColumn<string>(
+                name: "Changes",
+                table: "Cars",
+                type: "nvarchar(max)",
+                nullable: true);
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropColumn(
-                name: "Test",
-                table: "Employees");
+                name: "Changes",
+                table: "Cars");
         }
     }
 }

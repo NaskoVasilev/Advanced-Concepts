@@ -5,9 +5,8 @@ using System.Linq;
 using Microsoft.EntityFrameworkCore;
 using TemporalTablesDemo.Data.Common;
 using Microsoft.EntityFrameworkCore.ChangeTracking.Internal;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using TemporalTablesDemo.Data.Models.Enums;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using TemporalTablesDemo.Services.Models;
 
 namespace TemporalTablesDemo
 {
@@ -32,9 +31,24 @@ namespace TemporalTablesDemo
             //UpdateCompany(companyId, 1);
             //UpdateCompany(companyId, 2);
 
-            var carId = CreateCar();
-            UpdateCar(carId, 1);
-            UpdateCar(carId, 2);
+            //using
+            //var context = new CompanyDbContext();
+            //var historyService = new HistoryService(context);
+            //var result = historyService.GetHistoryById(2).ToList();
+            //Console.WriteLine(JsonSerializer.Serialize(result));
+
+            //var carId = CreateCar();
+            //UpdateCar(carId, 1);
+            //UpdateCar(carId, 2);
+
+            //using
+            //var context = new CompanyDbContext();
+            //var historyService = new HistoryService(context);
+            //var result = historyService.GetHistoryById<Car>(carId).ToList();
+            //Console.WriteLine(JsonSerializer.Serialize(result, new JsonSerializerOptions
+            //{
+            //    WriteIndented = true,
+            //}));
         }
 
         private static int CreateCar()
@@ -90,10 +104,6 @@ namespace TemporalTablesDemo
                         FirstName = "FN1-" + x,
                         LastName = "LN1-" + x,
                         Department = "Department1",
-                        Birth = new BirthAttributes()
-                        {
-                            Date = DateTime.Now
-                        }
                     })
                     .ToList()
             };
@@ -118,7 +128,6 @@ namespace TemporalTablesDemo
             {
                 employee.LastName = MarkAsEdited(employee.LastName, version);
                 employee.FirstName = MarkAsEdited(employee.FirstName, version);
-                employee.Birth.Date = DateTime.Now;
             }
 
             context.Update(company);

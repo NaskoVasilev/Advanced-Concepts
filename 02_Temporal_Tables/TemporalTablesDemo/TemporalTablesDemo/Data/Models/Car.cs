@@ -1,9 +1,9 @@
-﻿namespace TemporalTablesDemo.Data.Models
-{
-    public class Car
-    {
-        public int Id { get; set; }
+﻿using TemporalTablesDemo.Data.Common;
 
+namespace TemporalTablesDemo.Data.Models
+{
+    public class Car : Entity, ITemporalEntity
+    {
         public string Make { get; set; }
 
         public string Model { get; set; }
